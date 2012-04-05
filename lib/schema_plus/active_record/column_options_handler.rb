@@ -47,6 +47,16 @@ module SchemaPlus::ActiveRecord
     def column_index(table_name, column_name, options) #:nodoc:
       options = {} if options == true
       options = { :unique => true } if options == :unique
+      if options == :polymorphic || options[:polymorphic]
+        if column_name.ends_with?('_id')
+          return
+        elsif column_name.ends_with?('_type')
+          options = {} if options == :polymorphic
+          options[:with] = column_name
+          column_name = column_name.sub(/_type$/, '_id')
+          options.delete(:polymorphic)
+        end
+      end
       column_name = [column_name] + Array.wrap(options.delete(:with)).compact
       add_index(table_name, column_name, options)
     end
