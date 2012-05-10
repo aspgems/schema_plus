@@ -116,6 +116,12 @@ module SchemaPlus::ActiveRecord
       schema_plus_handle_column_options(table_name, column_name, options)
     end
 
+    # Remove a foreign key when the related column is renamed, otherwise rename fails.
+    def rename_column(table_name, column_name, new_column_name)
+      remove_foreign_key_if_exists(table_name, column_name)
+      super
+    end
+
     protected
     def remove_foreign_key_if_exists(table_name, column_name) #:nodoc:
       foreign_keys = ActiveRecord::Base.connection.foreign_keys(table_name.to_s)
